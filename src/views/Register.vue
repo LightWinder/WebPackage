@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bg flex sm:items-center " ref="bg">
-      <div class="box" :aaa="item.ref" :key="index" :style="'top:'+item.top" v-for="(item,index) in floaterTops">
+      <div class="box" :ref="item.ref" :key="item.ref" :style="'top:'+item.top" v-for="(item,index) in floaterTops">
         <div class="floater">
           <div class="box-side"></div>
           <div class="box-side"></div>
@@ -45,32 +45,51 @@ const createNode = function () {
 }
 export default {
   name: "register",
-  data(){
-    return{
-      floaterTops:[]
+  data() {
+    return {
+      floaterTops: [
+        { top:"30px",ref:"AADFSDF"},
+        { top:"130px",ref:"AADFSDF"},
+        { top:"430px",ref:"AADFSDF"}
+      ]
     }
   },
   methods: {
     login() {
       this.$router.replace('/home')
     },
-
+    getRandomString() {
+      let temp = ""
+      for (let i = 0; i < 10; i++) {
+        temp += String.fromCharCode(Math.floor(Math.random() * 15 + 1));
+      }
+      return temp;
+    },
+    clearBox(){
+      this.floaterTops = this.floaterTops.filter((item)=>{
+        console.log(this.floaterTops.length)
+        return this.floaterTops.indexOf(item)>= 10;
+      })
+    }
   },
   mounted() {
     const bg = this.$refs.bg;
     console.log(this.$data.floaterTops)
-    let timer = setInterval( ()=> {
-      this.floaterTops = this.floaterTops.filter((item)=>{
-        console.log(this.$refs)
-        return this.$refs[item.ref].clientX< document.documentElement.clientWidth;
-      })
-      for (let i = 0;i <3;i++){
-        const tempObj = {}
-        tempObj.top = Math.random()*bg.clientHeight + 'px';
-        tempObj.ref = Math.random()*Math.random()*1000;
-        this.floaterTops.push(tempObj);
-      }
-    },3000)
+    let clearTimer;
+    let timer = setInterval(() => {
+      // this.floaterTops = this.floaterTops.filter((item) => {
+      //   console.log(this.$refs[item.ref].offsetLeft,document.documentElement.clientWidth)
+      //   console.log(this.$refs[item.ref].offsetLeft < document.documentElement.clientWidth);
+      //   return this.$refs[item.ref].offsetLeft < document.documentElement.clientWidth;
+      // })
+      const tempObj = {}
+      tempObj.top = Math.random() * bg.clientHeight + 'px';
+      tempObj.ref = this.getRandomString();
+      this.floaterTops.push(tempObj);
+    }, 200)
+    setTimeout(()=>{
+      clearTimer = setInterval(this.clearBox,2000)
+    },5000)
   }
 }
 </script>
@@ -92,9 +111,10 @@ export default {
 
 .box {
   position: absolute;
-  left: 100px;
+  left: 0px;
   top: 20px;
-  animation: mover 5s infinite;
+  animation: mover 5s linear;
+  animation-fill-mode: forwards;
 }
 
 .floater {
@@ -155,10 +175,10 @@ export default {
 
 @keyframes mover {
   0% {
-    transform: translateX(0);
+    transform: translateX(-20vw);
   }
   100% {
-    transform: translateX(100vw);
+    transform: translateX(110vw);
   }
 }
 
